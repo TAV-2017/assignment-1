@@ -1,0 +1,7 @@
+# Git ignore
+
+out
+
+.idea
+
+*.iml
