@@ -12,10 +12,12 @@ public class Car {
     private int empty_meters;           // Current number of empty meters encountered.
     private int empty_parking_places;   // Current number of empty 5-meter stretches encountered.
 
-    private boolean visited[];
+    private boolean visited[];          // To allow backtracking, and to prevent registering a parking space twice.
 
     private boolean street[];           // To test an actual street. Contains true for "this current **METER** you're on
-                                        // is available for parking." false means there is a car there.
+                                        // is available for parking." false means there is a car there, or a stroller,
+                                        // i don't know. Could be a rock too, but that's not very likely, since its a
+                                        // street, you know?
 
     private static final int STREET_SIZE = 500;
 
@@ -42,25 +44,27 @@ public class Car {
 
     public int[] moveForward() {
 
-        if (location == 1 && isEmpty() == 200) {
-            empty_meters++;
-        }
+        if (!visited[location - 1]) {
+            visited[location - 1] = true;
 
-        if (location < 500) {
-            location++;
-
-            if (isEmpty() == 200) {
+            if (location == 1 && isEmpty() == 200) {
                 empty_meters++;
+            }
 
-                if (empty_meters == 5) {
-                    empty_parking_places++;
+            if (location < 500) {
+                location++;
+
+                if (isEmpty() == 200) {
+                    empty_meters++;
+
+                    if (empty_meters == 5) {
+                        empty_parking_places++;
+                        empty_meters = 0;
+                    }
+                } else {
                     empty_meters = 0;
                 }
-            } else {
-                empty_meters = 0;
             }
-        } else {
-
         }
 
 
@@ -70,26 +74,8 @@ public class Car {
 
     public int[] moveBackwards() {
 
-        if (isEmpty() == 200 && location > 1) {
-            empty_meters--;
-
-            if (empty_meters == -5) {
-                empty_parking_places--;
-                empty_meters = 0;
-            }
-
+        if (location > 1) {
             location--;
-        } else if (location > 1) {
-            empty_meters = 0;
-
-            location--;
-        } else {
-            /* Do nothing. */
-        }
-
-        if (location == 1 && isEmpty() == 200 && empty_parking_places != 0) {
-            empty_parking_places--;
-            empty_meters = 0;
         }
 
         return new int[] {location, empty_parking_places};
@@ -160,5 +146,10 @@ public class Car {
 
     public boolean getParked() {
         return parked;
+    }
+
+
+    public int getEmpty_parking_places() {
+        return empty_parking_places;
     }
 }
