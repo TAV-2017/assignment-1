@@ -7,8 +7,6 @@ public class Car {
 
     private int location;               // Current location (measured in meters) of the car.
 
-    private boolean parked;
-
     private int empty_meters;           // Current number of empty meters encountered.
     private int empty_parking_places;   // Current number of empty 5-meter stretches encountered.
 
@@ -42,6 +40,14 @@ public class Car {
         }
     }
 
+    /**
+     * Check whether the current meter has been visited or not, to determine if a found parking space should be added to
+     * the total or not. If the space has been visited, there is no point in adding it.
+     *
+     * @return int array where index 0 contains the car's location and index 1 contains the number of parking spaces
+     * found.
+     */
+
     public int[] moveForward() {
 
         if (!visited[location - 1]) {
@@ -65,6 +71,7 @@ public class Car {
                     empty_meters = 0;
                 }
             }
+        // If the space has been visited, the car still moves forward by does not register parking spaces.
         } else if (location < 500) {
             location++;
         }
@@ -74,6 +81,11 @@ public class Car {
         return new int[] {location, empty_parking_places};
     }
 
+    /**
+     * @return int array where index 0 contains the car's location and index 1 contains the number of parking spaces
+     * found.
+     */
+
     public int[] moveBackwards() {
 
         if (location > 1) {
@@ -82,6 +94,10 @@ public class Car {
 
         return new int[] {location, empty_parking_places};
     }
+
+    /**
+     * @return an integer between 0 and 200 representing a sensor value. 0 for occupied space and 200 for free space.
+     */
 
     public int isEmpty() {
         int sensor_1_total = 0;
@@ -110,45 +126,37 @@ public class Car {
         }
     }
 
+    /**
+     * @return 0 if the current space in the street is taken (false) and 200 if the space is empty (true)
+     */
+
     public int sensor_1() {
+
+        // The street array of booleans is initialized in the car's constructor.
         if (street[location - 1]) {
             return 200;
         } else {
             return 0;
         }
     }
+
+    /**
+     * @return 0 if the current space in the street is taken (false) and 200 if the space is empty (true)
+     */
 
     public int sensor_2() {
+
+        // The street array of booleans is initialized in the car's constructor.
         if (street[location - 1]) {
             return 200;
         } else {
             return 0;
-        }
-    }
-
-    public void park() {
-
-        int moving_To_Park[];
-        while (!parked) {
-            moving_To_Park = moveForward();
-
-            if(moving_To_Park[1] > 0){
-                for(int i = 0; i < 5; i++){
-                    moveBackwards();
-                }
-                parked = true;
-            }
         }
     }
 
     public int getLocation() {
         return location;
     }
-
-    public boolean getParked() {
-        return parked;
-    }
-
 
     public int getEmpty_parking_places() {
         return empty_parking_places;
