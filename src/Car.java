@@ -65,6 +65,8 @@ public class Car {
                     empty_meters = 0;
                 }
             }
+        } else if (location < 500) {
+            location++;
         }
 
 
@@ -126,16 +128,15 @@ public class Car {
 
     public void park() {
 
-        if (location < STREET_SIZE) {
-            int parking_spaces[];
-            while (!parked) {
-                parking_spaces = this.moveForward();
+        int moving_To_Park[];
+        while (!parked) {
+            moving_To_Park = moveForward();
 
-                if (parking_spaces[1] != 0){
-                    for(int i=parking_spaces[0]; i < 5 ; i++){
-                        moveBackwards();
-                    }
-                } parked = true;
+            if(moving_To_Park[1] > 0){
+                for(int i = 0; i < 5; i++){
+                    moveBackwards();
+                }
+                parked = true;
             }
         }
     }
