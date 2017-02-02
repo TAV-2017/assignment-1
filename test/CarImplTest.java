@@ -280,4 +280,43 @@ public class CarImplTest {
 
         Assertions.assertEquals(unParkedLocation, parkedLocation + 5);
     }
+
+    /**
+     * TC 18
+     */
+
+    @Test
+    public void testWhereIs1() {
+        car = new CarImpl();
+
+        Assertions.assertArrayEquals(new int[] {1, 0}, car.whereIs());
+    }
+
+    /**
+     * TC 19
+     */
+
+    @Test
+    public void testWhereIs2() {
+        car = new CarImpl();
+
+        for (int i = 0; i < 500; i++) {
+            car.moveForward();
+        }
+
+        Assertions.assertArrayEquals(new int[] {500, 0}, car.whereIs());
+    }
+
+    /**
+     * TC 20
+     */
+
+    @Test
+    public void testWhereIs3() {
+        car = new CarImpl();
+
+        car.park();
+
+        Assertions.assertArrayEquals(new int[] {1, 1}, car.whereIs());
+    }
 }
