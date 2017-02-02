@@ -15,6 +15,9 @@ public class CarImpl implements Car {
     private boolean street[];           // Needed to test the entire assignment, no specific Test case.
 
     private static final int STREET_SIZE = 500; // Since the street should be 500 meters long according to the assignment
+    private static final int CAR_SIZE = 5; // TC 13
+
+    int parked = 0;
                                                 // specification.
     public CarImpl() {
         location = 1;                   // Initialize car's location to 1 to accurately represent the car being at the beginning of the street, TC 1
@@ -115,18 +118,27 @@ public class CarImpl implements Car {
     }
 
     @Override
-    public boolean park() {
-        return false;
+    public void park() {
+        if (location >= STREET_SIZE - CAR_SIZE) {  // TC 13
+            parked = 0;
+        } else {
+            parked = 1;  // TC 12
+        }
     }
 
     @Override
-    public boolean unPark() {
-        return false;
+    public void unPark() {
+        if (parked == 0) {
+            throw new IllegalStateException();  // TC 15
+        } else {
+            parked = 0;  // TC 16
+            location += 5;  // TC 17
+        }
     }
 
     @Override
     public int[] whereIs() {
-        return new int[0];
+        return new int[] { location, parked };  // TC 12
     }
 
     private int sensor_1() {

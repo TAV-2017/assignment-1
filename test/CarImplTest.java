@@ -194,8 +194,90 @@ public class CarImplTest {
         Assertions.assertArrayEquals(new int[] {50, 2}, ret);
     }
 
-    @Test
-    public void testPark(){
+    /**
+     * TC 12
+     */
 
+    @Test
+    public void testPark1(){
+        car = new CarImpl();
+
+        car.park();
+
+        Assertions.assertEquals(1, car.whereIs()[1]);
+    }
+
+    /**
+     * TC 13
+     */
+
+    @Test
+    public void testPark2() {
+        car = new CarImpl();
+
+        for (int i = 0; i < 500; i++) {
+            car.moveForward();
+        }
+
+        car.park();
+
+        Assertions.assertEquals(0, car.whereIs()[1]);
+    }
+
+    /**
+     * TC 14
+     */
+
+    @Test
+    public void testPark3() {
+        car = new CarImpl();
+
+        car.moveForward();
+        car.moveBackward();
+        car.park();
+
+        Assertions.assertEquals(1, car.whereIs()[0]);
+    }
+
+    /**
+     * TC 15
+     */
+
+    @Test
+    public void testUnPark1() {
+        car = new CarImpl();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> car.unPark());
+    }
+
+    /**
+     * TC 16
+     */
+
+    @Test
+    public void testUnPark2() {
+        car = new CarImpl();
+
+        car.park();
+        car.unPark();
+
+        Assertions.assertEquals(0, car.whereIs()[1]);
+    }
+
+    /**
+     * TC 17
+     */
+
+    @Test
+    public void testUnPark3() {
+        car = new CarImpl();
+
+        car.park();
+        int parkedLocation = car.getLocation();
+
+        car.unPark();
+        int unParkedLocation = car.getLocation();
+
+        Assertions.assertEquals(unParkedLocation, parkedLocation + 5);
     }
 }

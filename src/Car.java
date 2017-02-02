@@ -50,7 +50,7 @@ public interface Car {
      1.
     */
 
-    boolean park();
+    void park();
 
     /**
      Name: unPark()
@@ -63,7 +63,7 @@ public interface Car {
      1.
     */
 
-    boolean unPark();
+    void unPark();
 
     /**
      Name: whereIs()
