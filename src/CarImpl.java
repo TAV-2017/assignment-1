@@ -9,6 +9,8 @@ public class CarImpl implements Car {
 
     private int empty_meters;           // Needed in order to find empty parking places. TC 5
     private int empty_parking_places;   // Needed in order to keep track of empty parking places. TC 4
+    private boolean at_empty_place = false;  // Needed in order to know whether the car is currently positioned at the
+                                             // end of an empty place. TC 13
 
     private boolean visited[];          // To allow backtracking, and to prevent registering a parking space twice. TC 5
 
@@ -43,6 +45,8 @@ public class CarImpl implements Car {
 
     public int[] moveForward() {
 
+        at_empty_place = false;  // TC 13
+
         if (!visited[location - 1]) {           // Visited is needed to avoid incrementing empty parking spaces more than
             visited[location - 1] = true;       // once if the car moves back and forth. TC 5
 
@@ -59,6 +63,7 @@ public class CarImpl implements Car {
                     if (empty_meters == 5) {    // TC 6
                         empty_parking_places++; // TC 6
                         empty_meters = 0;       // TC 6
+                        at_empty_place = true;  // TC 13
                     }
                 } else {
                     empty_meters = 0;           // For example, if an empty strech is located that is just 3 meters long,
@@ -119,10 +124,20 @@ public class CarImpl implements Car {
 
     @Override
     public void park() {
-        if (location >= STREET_SIZE - CAR_SIZE) {  // TC 13
-            parked = 0;
-        } else {
+        while (!at_empty_place) {
+            moveForward();
+            if (location > (STREET_SIZE - CAR_SIZE)) break;
+        }
+
+        if (at_empty_place) {  // TC 13
+            // Right now the car is overlapping with the empty place.
+            // Move one step forward for the empty place to end right where the car begins.
+            moveForward();
+
             parked = 1;  // TC 12
+            location -= CAR_SIZE;
+        } else {
+            parked = 0;
         }
     }
 
@@ -132,7 +147,7 @@ public class CarImpl implements Car {
             throw new IllegalStateException();  // TC 15
         } else {
             parked = 0;  // TC 16
-            location += 5;  // TC 17
+            location += CAR_SIZE;  // TC 17
         }
     }
 
