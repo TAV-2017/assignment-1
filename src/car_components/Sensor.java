@@ -14,6 +14,6 @@ public interface Sensor {
      * See report.
      */
 
-    int measureDistance();
+    int measureDistance(int location);
 
 }

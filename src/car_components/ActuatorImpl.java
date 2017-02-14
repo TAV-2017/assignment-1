@@ -2,6 +2,7 @@ package car_components;
 
 
 public class ActuatorImpl implements Actuator {
+    private int location;
 
     @Override
     public int forward() {
@@ -13,8 +14,7 @@ public class ActuatorImpl implements Actuator {
         return 0;
     }
 
-    @Override
     public int getLocation() {
-        return 0;
+        return location;
     }
 }

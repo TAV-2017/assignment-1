@@ -1,51 +1,34 @@
-
+import car_components.ActuatorImpl;
+import car_components.SensorImpl;
 
 public class CarImpl implements Car {
+    SensorImpl sensor_1 = new SensorImpl();
+    SensorImpl sensor_1 = new SensorImpl();
 
-    private int location;               // Needed in order to keep track of the car's location. TC 1, 2, 3
+    ActuatorImpl actuator = new ActuatorImpl();
 
-    private int empty_meters;           // Needed in order to find empty parking places. TC 5
-    private int empty_parking_places;   // Needed in order to keep track of empty parking places. TC 4
-    private boolean at_empty_place = false;  // Needed in order to know whether the car is currently positioned at the
-                                             // end of an empty place. TC 13
+    private boolean[] visited;
 
-    private boolean visited[];          // To allow backtracking, and to prevent registering a parking space twice. TC 5
+    private int empty_meters;
+    private int empty_parking_spaces;
 
-    private boolean street[];           // Needed to test the entire assignment, no specific Test case.
+    private boolean at_empty_place = false;
+    private int parked = 0;
 
-    private static final int STREET_SIZE = 500; // Since the street should be 500 meters long according to the assignment
     private static final int CAR_SIZE = 5; // TC 13
 
-    int parked = 0;
-                                                // specification.
+
     public CarImpl() {
-        location = 1;                   // Initialize car's location to 1 to accurately represent the car being at the beginning of the street, TC 1
         empty_meters = 0;               // While no empty meters have been noticed, needs to be initialized to 0, TC 6
-        empty_parking_places = 0;       // Empty parking places should be 0 before one is discovered, TC 4
-
-        visited = new boolean[STREET_SIZE];     // The visited array keeps track of where the car has been so that the
-                                                // parking counter does not increase if the car has moved back and forth.
-                                                // TC 5
-        /*
-        Initializing the street to contain a set number of parking spaces, one every 50 meters, 10 in total.
-         */
-
-        street = new boolean[STREET_SIZE];
-        for (int i = 0; i < 500; i += 50) {
-            int count = i;
-            for (int j = 0; j < 5; j++) {
-                street[count] = true;
-                count++;
-            }
-        }
+        empty_parking_spaces = 0;       // Empty parking places should be 0 before one is discovered, TC 4
     }
 
     public int[] moveForward() {
 
         at_empty_place = false;  // TC 13
 
-        if (!visited[location - 1]) {           // Visited is needed to avoid incrementing empty parking spaces more than
-            visited[location - 1] = true;       // once if the car moves back and forth. TC 5
+        if (!visited[location - 1]) {                   // Visited is needed to avoid incrementing empty parking spaces more than
+            visited[location - 1] = true;               // once if the car moves back and forth. TC 5
 
             if (location == 1 && isEmpty() == 200) {    // If a parking space is at the very beginning of the street,
                 empty_meters++;                         // this space was not checked without this if-statement. TC 6
@@ -58,7 +41,7 @@ public class CarImpl implements Car {
                     empty_meters++;             // TC 6
 
                     if (empty_meters == 5) {    // TC 6
-                        empty_parking_places++; // TC 6
+                        empty_parking_spaces++; // TC 6
                         empty_meters = 0;       // TC 6
                         at_empty_place = true;  // TC 13
                     }
@@ -73,16 +56,16 @@ public class CarImpl implements Car {
 
 
         // Return the location and current number of noticed parking spaces (5 meter stretches).
-        return new int[] {location, empty_parking_places};  // To return the information that is desired by the specification, TC 6
+        return new int[] {location, empty_parking_spaces};  // To return the information that is desired by the specification, TC 6
     }
 
     public int[] moveBackward() {
 
-        if (location > 1) {     // To avoid the car going beyond the street border, TC 8
-            location--;         // To make sure that the car moves backwards when moveBackwards() is called, TC 9, 5, 10
+        if (actuator.getLocation() > 1) {     // To avoid the car going beyond the street border, TC 8
+            actuator.backward();         // To make sure that the car moves backwards when moveBackwards() is called, TC 9, 5, 10
         }
 
-        return new int[] {location, empty_parking_places};      // Needed to satisfy the requirement to return an integer
+        return new int[] { actuator.getLocation(), empty_parking_spaces };      // Needed to satisfy the requirement to return an integer
     }                                                           // array of the car's location and number of detected parking places. TC 11
 
     public int isEmpty() {
@@ -153,33 +136,8 @@ public class CarImpl implements Car {
         return new int[] { location, parked };  // TC 12
     }
 
-    private int sensor_1() {
-
-        // The street array of booleans is initialized in the car's constructor.
-        if (street[location - 1]) {
-            return 200;
-        } else {
-            return 0;
-        }
-    }
-
-    private int sensor_2() {
-
-        // The street array of booleans is initialized in the car's constructor.
-        if (street[location - 1]) {
-            return 200;
-        } else {
-            return 0;
-        }
-    }
-
-    // Necessary for testing the car's location, TC 1
-    public int getLocation() {
-        return location;
-    }
-
     // Necessary for testing the car's number of found parking spaces, TC 4
-    public int getEmpty_parking_places() {
-        return empty_parking_places;
+    public int getEmpty_parking_spaces() {
+        return empty_parking_spaces;
     }
 }

@@ -31,17 +31,4 @@ public interface Actuator {
 
     int backward();
 
-    /**
-     * Name: getLocation()
-     * Input: void
-     * Output: Integer representing the car's current location.
-     * Pre-condition: Car object is instantiated.
-     * Post-condition: The car's location has been returned.
-     *
-     * Test cases:
-     * None, this is a supporting method.
-     */
-
-    int getLocation();
-
 }
