@@ -1,7 +1,4 @@
-/**
- * Created by MTs on 27/01/17.
- *
- */
+
 
 public class main {
 

@@ -1,7 +1,4 @@
-/**
- * Created by MTs on 28/01/17.
- *
- */
+
 
 public class CarImpl implements Car {
 
