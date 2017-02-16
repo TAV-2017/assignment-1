@@ -26,6 +26,14 @@ public class CarImpl implements Car {
         this.size = size;
     }
 
+    public void setSensor_1(SensorImpl sensor_1) {
+        this.sensor_1 = sensor_1;
+    }
+
+    public void setSensor_2(SensorImpl sensor_2) {
+        this.sensor_2 = sensor_2;
+    }
+
     /**
      * Get car size
      */
@@ -63,7 +71,7 @@ public class CarImpl implements Car {
             return sensor_2_average;
         }
 
-        throw new RuntimeException();
+        throw new IllegalStateException();
     }
 
     private void recordSensor() {
@@ -135,8 +143,11 @@ public class CarImpl implements Car {
             throw new IllegalStateException();
         }
 
+        recordSensor();
+
         while (!isAtEmptyPlace()) {
             actuator.forward();
+            recordSensor();
 
             if (actuator.getLocation() == (Actuator.STREET_SIZE - 1)) {
                 break;
