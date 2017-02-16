@@ -1,143 +1,163 @@
+import car_components.Actuator;
 import car_components.ActuatorImpl;
+import car_components.Sensor;
 import car_components.SensorImpl;
 
 public class CarImpl implements Car {
+
     SensorImpl sensor_1 = new SensorImpl();
-    SensorImpl sensor_1 = new SensorImpl();
+    SensorImpl sensor_2 = new SensorImpl();
 
     ActuatorImpl actuator = new ActuatorImpl();
 
-    private boolean[] visited;
+    private boolean[] visited = new boolean[Sensor.STREET_SIZE];
+    private boolean[] empty = new boolean[Sensor.STREET_SIZE];
 
-    private int empty_meters;
-    private int empty_parking_spaces;
+    private int size;
+    private boolean parked;
 
-    private boolean at_empty_place = false;
-    private int parked = 0;
-
-    private static final int CAR_SIZE = 5; // TC 13
-
+    private static final int DEFAULT_CAR_SIZE = 5;
 
     public CarImpl() {
-        empty_meters = 0;               // While no empty meters have been noticed, needs to be initialized to 0, TC 6
-        empty_parking_spaces = 0;       // Empty parking places should be 0 before one is discovered, TC 4
+        this(DEFAULT_CAR_SIZE);
     }
 
-    public int[] moveForward() {
-
-        at_empty_place = false;  // TC 13
-
-        if (!visited[location - 1]) {                   // Visited is needed to avoid incrementing empty parking spaces more than
-            visited[location - 1] = true;               // once if the car moves back and forth. TC 5
-
-            if (location == 1 && isEmpty() == 200) {    // If a parking space is at the very beginning of the street,
-                empty_meters++;                         // this space was not checked without this if-statement. TC 6
-            }
-
-            if (location < STREET_SIZE) {               // Avoid going beyond the street border, TC 3
-                location++;
-
-                if (isEmpty() == 200) {         // In order to find empty 5-meter stretches, TC 6
-                    empty_meters++;             // TC 6
-
-                    if (empty_meters == 5) {    // TC 6
-                        empty_parking_spaces++; // TC 6
-                        empty_meters = 0;       // TC 6
-                        at_empty_place = true;  // TC 13
-                    }
-                } else {
-                    empty_meters = 0;           // For example, if an empty strech is located that is just 3 meters long,
-                }                               // empty meters needs to be reset, TC 5, 6
-            }
-        // If the space has been visited, the car still moves forward by does not register parking spaces.
-        } else if (location < STREET_SIZE) {    // Avoid going beyond street border, TC 3
-            location++;                         // Increment location to accurately represent car's location, TC 2
-        }
-
-
-        // Return the location and current number of noticed parking spaces (5 meter stretches).
-        return new int[] {location, empty_parking_spaces};  // To return the information that is desired by the specification, TC 6
+    public CarImpl(int size) {
+        this.size = size;
     }
 
-    public int[] moveBackward() {
-
-        if (actuator.getLocation() > 1) {     // To avoid the car going beyond the street border, TC 8
-            actuator.backward();         // To make sure that the car moves backwards when moveBackwards() is called, TC 9, 5, 10
-        }
-
-        return new int[] { actuator.getLocation(), empty_parking_spaces };      // Needed to satisfy the requirement to return an integer
-    }                                                           // array of the car's location and number of detected parking places. TC 11
-
+    @Override
     public int isEmpty() {
         int sensor_1_total = 0;
         int sensor_2_total = 0;
 
-        int sensor_1_average;
-        int sensor_2_average;
-
-        int average;
-
-        /*
-        Gets sensor values five times, as per the assignment specification.
-         */
+        // Get sensor values five times, as per the assignment specification.
         for (int i = 0; i < 5; i++) {
-            sensor_1_total += sensor_1();
-            sensor_2_total += sensor_2();
+            sensor_1_total += sensor_1.measureDistance(actuator.getLocation());
+            sensor_2_total += sensor_2.measureDistance(actuator.getLocation());
         }
 
-        /*
-        Gets the average values for the sensors, as per the assignment specification.
-         */
-        sensor_1_average = sensor_1_total / 5;
-        sensor_2_average = sensor_2_total / 5;
-        average = sensor_1_average + sensor_2_average;
+        // Get the average values for the sensors, as per the assignment specification.
+        int sensor_1_average = sensor_1_total / 5;
+        int sensor_2_average = sensor_2_total / 5;
 
-        // By returning just one of the sensor's value, it is ensured that the returned integer is within the range of 0 -> 200, TC 7, 6, 5
-        if (average == 400 || average == 0) {
+        boolean sensor_1_valid = Sensor.isValid(sensor_1_average);
+        boolean sensor_2_valid = Sensor.isValid(sensor_2_average);
+
+        if (sensor_1_valid && sensor_2_valid) {
+            return (sensor_1_average + sensor_2_average) / 2;
+        }
+
+        if (sensor_1_valid) {
             return sensor_1_average;
-        } else if (sensor_1_average == 200 || sensor_1_average == 0) {
-            return sensor_1_average;
-        } else {
+        }
+
+        if (sensor_2_valid) {
             return sensor_2_average;
         }
+
+        throw new RuntimeException();
+    }
+
+    /**
+     * Count the number of empty places found in the map
+     */
+    private int countEmptyPlaces() {
+        int places = 0;
+
+        int tempEmptyLocations = 0;
+
+        for (int i = 0; i < Sensor.STREET_SIZE; i++) {
+            if (empty[i]) {
+                tempEmptyLocations += 1;
+            }
+
+            if (tempEmptyLocations == size) {
+                places += 1;
+                tempEmptyLocations = 0;
+            }
+
+            if (!visited[i]) {
+                break;
+            }
+        }
+
+        return places;
+    }
+
+    /**
+     * Get whether the car is at the end of an empty place
+     */
+    private boolean isAtEmptyPlace() {
+        int location = actuator.getLocation();
+
+        visited[location] = true;
+        empty[location] = isEmpty() == 200;
+
+        boolean isEmptyPlace = true;
+        for (int i = 0; i < size; i++) {
+            isEmptyPlace &= (location - i >= 0) && empty[location - i];
+        }
+
+        return isEmptyPlace;
+    }
+
+    @Override
+    public int[] moveForward() {
+        actuator.forward();
+        return new int[] { actuator.getLocation(), countEmptyPlaces() };
+    }
+
+    @Override
+    public int[] moveBackward() {
+        actuator.backward();
+        return new int[] { actuator.getLocation(), countEmptyPlaces() };
     }
 
     @Override
     public void park() {
-        while (!at_empty_place) {
-            moveForward();
-            if (location > (STREET_SIZE - CAR_SIZE)) break;
+        if (parked) {
+            throw new IllegalStateException();
         }
 
-        if (at_empty_place) {  // TC 13
+        while (!isAtEmptyPlace()) {
+            actuator.forward();
+
+            if (actuator.getLocation() == Actuator.STREET_SIZE) {
+                break;
+            }
+        }
+
+        if (isAtEmptyPlace()) {
             // Right now the car is overlapping with the empty place.
             // Move one step forward for the empty place to end right where the car begins.
-            moveForward();
+            actuator.forward();
 
-            parked = 1;  // TC 12
-            location -= CAR_SIZE;
+            parked = true;
+
+            for (int i = 0; i < size; i++) {
+                actuator.backward();
+            }
         } else {
-            parked = 0;
+            parked = false;
         }
     }
 
     @Override
     public void unPark() {
-        if (parked == 0) {
-            throw new IllegalStateException();  // TC 15
+        if (parked) {
+            parked = false;
+
+            for (int i = 0; i < size; i++) {
+                actuator.forward();
+            }
         } else {
-            parked = 0;  // TC 16
-            location += CAR_SIZE;  // TC 17
+            throw new IllegalStateException();
         }
     }
 
     @Override
     public int[] whereIs() {
-        return new int[] { location, parked };  // TC 12
-    }
-
-    // Necessary for testing the car's number of found parking spaces, TC 4
-    public int getEmpty_parking_spaces() {
-        return empty_parking_spaces;
+        return new int[] { actuator.getLocation(), parked ? 1 : 0 };
     }
 }

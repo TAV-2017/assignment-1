@@ -3,6 +3,8 @@ package car_components;
 
 public interface Actuator {
 
+    public static final int STREET_SIZE = 500;
+
     /**
      * Name: forward()
      * Input: void

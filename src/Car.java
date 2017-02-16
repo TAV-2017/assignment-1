@@ -3,19 +3,6 @@
 public interface Car {
 
     /**
-     * Name: moveForward()
-     * Input: void
-     * Output: integer array: [0] - car’s location [1] - number of found parking spaces.
-     * Pre-condition: car object is instantiated
-     * Post-condition: car object’s location is now incremented by one
-     *
-     * Test cases:
-     * See report.
-    */
-
-    int[] moveForward();
-
-    /**
      * Name: isEmpty()
      * Input: void
      * Output: integer in the range of 0 to 200
@@ -24,9 +11,20 @@ public interface Car {
      *
      * Test cases:
      * See report.
-    */
-
+     */
     int isEmpty();
+
+    /**
+     * Name: moveForward()
+     * Input: void
+     * Output: integer array: [0] - car’s location [1] - number of found parking spaces.
+     * Pre-condition: car object is instantiated
+     * Post-condition: car object’s location is now incremented by one
+     *
+     * Test cases:
+     * See report.
+     */
+    int[] moveForward();
 
     /**
      * Name: moveBackward()
@@ -37,8 +35,7 @@ public interface Car {
      *
      * Test cases:
      * See report.
-    */
-
+     */
     int[] moveBackward();
 
     /**
@@ -50,8 +47,7 @@ public interface Car {
      *
      * Test cases:
      * See report.
-    */
-
+     */
     void park();
 
     /**
@@ -63,8 +59,7 @@ public interface Car {
      *
      * Test cases:
      * See report.
-    */
-
+     */
     void unPark();
 
     /**
@@ -77,6 +72,5 @@ public interface Car {
      * Test cases:
      * See report.
      */
-
     int[] whereIs();
 }

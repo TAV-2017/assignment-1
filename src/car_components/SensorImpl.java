@@ -1,10 +1,9 @@
 package car_components;
 
 
-public class SensorImpl implements Sensor{
-    private boolean street[];
+public class SensorImpl implements Sensor {
 
-    private static final int STREET_SIZE = 500;
+    private boolean street[];
 
     public SensorImpl() {
         street = new boolean[STREET_SIZE];
@@ -27,6 +26,6 @@ public class SensorImpl implements Sensor{
 
     @Override
     public int measureDistance(int location) {
-        return street[location - 1] ? 200 : 0;
+        return street[location] ? 200 : 0;
     }
 }

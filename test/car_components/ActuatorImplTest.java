@@ -33,7 +33,7 @@ public class ActuatorImplTest {
             actuator.forward();
         }
 
-        Assertions.assertEquals(500, actuator.getLocation(), "The car moved beyond the street limit.");
+        Assertions.assertEquals(500 - 1, actuator.getLocation(), "The car moved beyond the street limit.");
     }
 
     /**
@@ -50,7 +50,7 @@ public class ActuatorImplTest {
         actuator.forward();
         int location = actuator.forward();
 
-        Assertions.assertEquals(5, actuator.backward(), "The car did not move the one expected step" +
+        Assertions.assertEquals(5 - 1, actuator.backward(), "The car did not move the one expected step" +
                 " backwards.");
     }
 
@@ -62,6 +62,6 @@ public class ActuatorImplTest {
     public void testMoveBeyondBackwardStreetLimit() {
         actuator = new ActuatorImpl();
 
-        Assertions.assertEquals(1, actuator.backward(), "The car moved beyond the street limit.");
+        Assertions.assertEquals(0, actuator.backward(), "The car moved beyond the street limit.");
     }
 }
