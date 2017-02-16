@@ -26,6 +26,13 @@ public class CarImpl implements Car {
         this.size = size;
     }
 
+    /**
+     * Get car size
+     */
+    public int getSize() {
+        return size;
+    }
+
     @Override
     public int isEmpty() {
         int sensor_1_total = 0;
@@ -69,14 +76,12 @@ public class CarImpl implements Car {
     /**
      * Get whether the car is at the end of an empty place
      */
-    private boolean isAtEmptyPlace() {
-        recordSensor();
-
+    public boolean isAtEmptyPlace() {
         int location = actuator.getLocation();
 
         boolean isEmptyPlace = true;
         for (int i = 0; i < size; i++) {
-            isEmptyPlace &= (location - i >= 0) && empty[location - i];
+            isEmptyPlace &= (location - i >= 0) && visited[location - i] && empty[location - i];
         }
 
         return isEmptyPlace;
@@ -86,8 +91,6 @@ public class CarImpl implements Car {
      * Count the number of empty places found in the map
      */
     private int countEmptyPlaces() {
-        recordSensor();
-
         int places = 0;
 
         int tempEmptyLocations = 0;
@@ -95,6 +98,8 @@ public class CarImpl implements Car {
         for (int i = 0; i < Sensor.STREET_SIZE; i++) {
             if (empty[i]) {
                 tempEmptyLocations += 1;
+            } else {
+                tempEmptyLocations = 0;
             }
 
             if (tempEmptyLocations == size) {
@@ -112,12 +117,14 @@ public class CarImpl implements Car {
 
     @Override
     public int[] moveForward() {
+        recordSensor();
         actuator.forward();
         return new int[] { actuator.getLocation(), countEmptyPlaces() };
     }
 
     @Override
     public int[] moveBackward() {
+        recordSensor();
         actuator.backward();
         return new int[] { actuator.getLocation(), countEmptyPlaces() };
     }
@@ -131,7 +138,7 @@ public class CarImpl implements Car {
         while (!isAtEmptyPlace()) {
             actuator.forward();
 
-            if (actuator.getLocation() == Actuator.STREET_SIZE) {
+            if (actuator.getLocation() == (Actuator.STREET_SIZE - 1)) {
                 break;
             }
         }
