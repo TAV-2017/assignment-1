@@ -59,10 +59,35 @@ public class CarImpl implements Car {
         throw new RuntimeException();
     }
 
+    private void recordSensor() {
+        int location = actuator.getLocation();
+
+        visited[location] = true;
+        empty[location] = isEmpty() == 200;
+    }
+
+    /**
+     * Get whether the car is at the end of an empty place
+     */
+    private boolean isAtEmptyPlace() {
+        recordSensor();
+
+        int location = actuator.getLocation();
+
+        boolean isEmptyPlace = true;
+        for (int i = 0; i < size; i++) {
+            isEmptyPlace &= (location - i >= 0) && empty[location - i];
+        }
+
+        return isEmptyPlace;
+    }
+
     /**
      * Count the number of empty places found in the map
      */
     private int countEmptyPlaces() {
+        recordSensor();
+
         int places = 0;
 
         int tempEmptyLocations = 0;
@@ -83,23 +108,6 @@ public class CarImpl implements Car {
         }
 
         return places;
-    }
-
-    /**
-     * Get whether the car is at the end of an empty place
-     */
-    private boolean isAtEmptyPlace() {
-        int location = actuator.getLocation();
-
-        visited[location] = true;
-        empty[location] = isEmpty() == 200;
-
-        boolean isEmptyPlace = true;
-        for (int i = 0; i < size; i++) {
-            isEmptyPlace &= (location - i >= 0) && empty[location - i];
-        }
-
-        return isEmptyPlace;
     }
 
     @Override

@@ -1,3 +1,4 @@
+import car_components.Actuator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,11 @@ public class CarImplTest {
     @Test
     public void testScenario1() {
         CarImpl car = new CarImpl();
+
+        Assertions.assertEquals(car.whereIs()[0], 0);
+        for (int i = 0; i < Actuator.STREET_SIZE; i++) {
+            car.moveForward();
+        }
     }
 
 }
